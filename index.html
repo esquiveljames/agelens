@@ -1,0 +1,150 @@
+<!doctype html>
+<!--
+  index.html — the screens of AgeLens.
+  There are three screens (home, camera, result). app.js shows one at a time.
+  Every file is in ONE folder (no sub-folders), and all paths are relative,
+  so it works on GitHub Pages at https://USERNAME.github.io/agelens/
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- Fit the phone screen; viewport-fit=cover lets the app use the full screen in standalone mode -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>AgeLens — AI Age Guess</title>
+  <meta name="description" content="Take a selfie and a small on-device AI model estimates your age. Your photo never leaves your phone.">
+  <meta name="theme-color" content="#0d1020">
+  <!-- The web app manifest is what makes "Install app" appear in Chrome on Android -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ===================== SCREEN 1: HOME ===================== -->
+  <main id="screen-home" class="screen">
+    <header class="brand">
+      <img src="icon-192.png" alt="" width="44" height="44">
+      <span>Age<b>Lens</b></span>
+    </header>
+
+    <section class="hero">
+      <!-- Small illustration: a face inside a scanning outline -->
+      <svg class="hero-art" viewBox="0 0 200 200" aria-hidden="true">
+        <ellipse cx="100" cy="98" rx="62" ry="80" class="art-oval"/>
+        <circle cx="78" cy="88" r="5" class="art-dot"/>
+        <circle cx="122" cy="88" r="5" class="art-dot"/>
+        <path d="M80 128 Q100 142 120 128" class="art-line"/>
+        <line x1="30" y1="98" x2="170" y2="98" class="art-scan"/>
+      </svg>
+      <h1>How old do I look?</h1>
+      <p>Fit your face inside the outline, take a photo, and a small AI model on your phone estimates your age from your facial features.</p>
+    </section>
+
+    <div class="actions">
+      <button id="btn-start" class="btn btn-primary" type="button">📷 Start Camera</button>
+      <label class="btn btn-secondary" for="file-input">🖼️ Use a Photo Instead</label>
+      <!-- capture="user" opens the front camera app on many phones; it also allows picking from the gallery -->
+      <input id="file-input" type="file" accept="image/*" hidden>
+    </div>
+
+    <p id="home-status" class="status-line" role="status"></p>
+
+    <section class="card privacy">
+      <h2>🔒 Private by design</h2>
+      <p>Everything happens <strong>on this phone</strong>. Your photo is never uploaded, never saved, and disappears when you leave the result screen. No account, no ads, no tracking.</p>
+    </section>
+
+    <details class="card">
+      <summary>How does it work?</summary>
+      <ol class="how">
+        <li><strong>Find the face.</strong> A tiny neural network (Tiny Face Detector) locates your face in the camera image.</li>
+        <li><strong>Crop it.</strong> Only the face area is passed on.</li>
+        <li><strong>Estimate age.</strong> A small convolutional neural network (AgeGenderNet from the open-source face-api project, about 420&nbsp;KB) looks at patterns such as skin texture, face shape, and proportions, and outputs a number.</li>
+        <li><strong>Average.</strong> The app checks your photo and its mirror image and averages the two guesses for a steadier result.</li>
+      </ol>
+    </details>
+
+    <details class="card">
+      <summary>How accurate is it?</summary>
+      <p>It's a <strong>guess</strong>, often off by 5 years or more. Lighting, glasses, makeup, facial hair, expression, and camera quality all change the result. Models like this are trained on public photo collections that don't represent every age group and ethnicity equally, so they can be less accurate for some people — especially children and older adults.</p>
+      <p><strong>Use it for fun and for learning about AI — never to verify anyone's real age.</strong></p>
+    </details>
+
+    <footer class="foot">
+      Uses <a href="https://github.com/vladmandic/face-api" target="_blank" rel="noopener">face-api</a> (MIT License) with TensorFlow.js.
+      <span id="install-hint"></span>
+    </footer>
+  </main>
+
+  <!-- ===================== SCREEN 2: CAMERA ===================== -->
+  <main id="screen-camera" class="screen" hidden>
+    <div class="cam-top">
+      <button id="btn-cam-back" class="icon-btn" type="button" aria-label="Back">←</button>
+      <span class="cam-title">Fit your face in the outline</span>
+      <button id="btn-flip" class="icon-btn" type="button" aria-label="Switch camera">🔄</button>
+    </div>
+
+    <!-- The camera picture and the face outline sit on top of each other -->
+    <div class="viewfinder" id="viewfinder">
+      <video id="video" playsinline muted autoplay></video>
+      <!-- Dark mask with an oval "window", plus the oval outline itself -->
+      <svg class="overlay" viewBox="0 0 300 400" preserveAspectRatio="none" aria-hidden="true">
+        <path class="mask" fill-rule="evenodd"
+              d="M0 0H300V400H0Z M45 190 a105 140 0 1 0 210 0 a105 140 0 1 0 -210 0Z"/>
+        <ellipse id="oval" class="oval" cx="150" cy="190" rx="105" ry="140"/>
+      </svg>
+      <div class="flash" id="flash"></div>
+    </div>
+
+    <p id="cam-status" class="cam-status" role="status" aria-live="polite">Starting camera…</p>
+
+    <div class="shutter-row">
+      <button id="btn-capture" class="shutter" type="button" aria-label="Take photo" disabled></button>
+    </div>
+  </main>
+
+  <!-- ===================== SCREEN 3: RESULT ===================== -->
+  <main id="screen-result" class="screen" hidden>
+    <div class="cam-top">
+      <button id="btn-result-back" class="icon-btn" type="button" aria-label="Back to start">←</button>
+      <span class="cam-title">Your result</span>
+      <span class="icon-btn-spacer"></span>
+    </div>
+
+    <div class="result-photo">
+      <canvas id="result-canvas" width="480" height="600" aria-label="Your photo"></canvas>
+    </div>
+
+    <section class="result-card" id="result-card">
+      <p class="result-label">Estimated age</p>
+      <p class="result-age"><span id="age-value">--</span><small> years</small></p>
+      <p class="result-range" id="age-range"></p>
+      <div class="meter" aria-hidden="true"><div class="meter-band" id="meter-band"></div><div class="meter-dot" id="meter-dot"></div></div>
+      <div class="meter-scale" aria-hidden="true"><span>0</span><span>20</span><span>40</span><span>60</span><span>80+</span></div>
+      <p class="result-note">This is an AI estimate based on how a face looks in one photo — not a fact about the person.</p>
+      <p class="tech" id="tech-info"></p>
+    </section>
+
+    <section class="result-card error-card" id="error-card" hidden>
+      <p class="result-label">No face found</p>
+      <p id="error-text">Try again with your whole face inside the outline, in good light.</p>
+    </section>
+
+    <div class="actions">
+      <button id="btn-retake" class="btn btn-primary" type="button">📷 Take Another</button>
+      <button id="btn-home" class="btn btn-secondary" type="button">Done</button>
+    </div>
+  </main>
+
+  <!-- Loading overlay while the AI model downloads/starts -->
+  <div id="loader" class="loader" hidden>
+    <div class="spinner" aria-hidden="true"></div>
+    <p id="loader-text">Loading AI model…</p>
+  </div>
+
+  <!-- Scripts: the AI library first, then our app -->
+  <script src="face-api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

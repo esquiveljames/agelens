@@ -1,0 +1,133 @@
+/* =====================================================================
+   styles.css — AgeLens look & feel (phone-first, dark camera-app style)
+   Change the colours in :root to re-theme the app.
+   ===================================================================== */
+:root {
+  --bg: #0d1020;          /* app background */
+  --surface: #171b33;     /* cards */
+  --line: #2a3058;        /* borders */
+  --text: #f2f4ff;
+  --muted: #a9b0d6;
+  --mint: #7cf2c5;        /* main accent (good / go) */
+  --coral: #ff8a6b;       /* secondary accent */
+  --warn: #ffd166;
+  --radius: 18px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); }
+body { min-height: 100vh; min-height: 100dvh; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+a { color: var(--mint); }
+:focus-visible { outline: 3px solid var(--mint); outline-offset: 3px; border-radius: 10px; }
+
+.screen {
+  max-width: 520px; margin: 0 auto;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+/* ---------- Home ---------- */
+.brand { display: flex; align-items: center; gap: 10px; font-size: 1.35rem; font-weight: 700; }
+.brand img { border-radius: 12px; }
+.brand b { color: var(--mint); }
+
+.hero { text-align: center; padding-top: 4px; }
+.hero h1 { font-size: 1.9rem; margin: 6px 0 8px; letter-spacing: -0.02em; }
+.hero p { color: var(--muted); line-height: 1.55; margin: 0; }
+.hero-art { width: 150px; height: 150px; }
+.art-oval { fill: none; stroke: var(--mint); stroke-width: 4; stroke-dasharray: 10 8; }
+.art-dot { fill: var(--text); }
+.art-line { fill: none; stroke: var(--text); stroke-width: 4; stroke-linecap: round; }
+.art-scan { stroke: var(--coral); stroke-width: 3; animation: scan 2.4s ease-in-out infinite; }
+@keyframes scan { 0%, 100% { transform: translateY(-55px); } 50% { transform: translateY(55px); } }
+
+.actions { display: grid; gap: 12px; }
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 56px; padding: 12px 20px; border-radius: 16px; border: 0;
+  font: inherit; font-size: 1.08rem; font-weight: 700; cursor: pointer; text-decoration: none;
+}
+.btn-primary { background: var(--mint); color: #062a1e; }
+.btn-secondary { background: transparent; color: var(--text); border: 2px solid var(--line); }
+.btn:active { transform: scale(0.98); }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+.card h2 { font-size: 1.05rem; margin: 0 0 6px; }
+.card p { margin: 0 0 8px; color: var(--muted); line-height: 1.55; }
+.card p:last-child { margin-bottom: 0; }
+.card strong { color: var(--text); }
+summary { font-weight: 700; cursor: pointer; min-height: 32px; display: flex; align-items: center; }
+details[open] summary { margin-bottom: 10px; }
+.how { margin: 0; padding-left: 1.2em; color: var(--muted); line-height: 1.55; display: grid; gap: 8px; }
+.privacy { border-color: #2f5c50; background: linear-gradient(135deg, #142a2a, var(--surface)); }
+.status-line { color: var(--warn); text-align: center; margin: 0; min-height: 1em; }
+.foot { color: var(--muted); font-size: 0.85rem; text-align: center; line-height: 1.6; }
+.link-btn { background: none; border: 0; color: var(--mint); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; padding: 6px; }
+
+/* ---------- Camera ---------- */
+.cam-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cam-title { font-weight: 700; text-align: center; flex: 1; }
+.icon-btn {
+  width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--line);
+  background: var(--surface); color: var(--text); font-size: 1.25rem; cursor: pointer;
+}
+.icon-btn-spacer { width: 48px; }
+
+/* 3:4 box: the video fills it ("cover") and the outline sits on top */
+.viewfinder {
+  position: relative; width: min(100%, calc(68vh * 3 / 4)); width: min(100%, calc(68dvh * 3 / 4)); aspect-ratio: 3 / 4; border-radius: 24px; overflow: hidden;
+  background: #000; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  margin: 0 auto;
+}
+.viewfinder video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.viewfinder video.mirrored { transform: scaleX(-1); }
+.overlay { position: absolute; inset: 0; width: 100%; height: 100%; }
+.mask { fill: rgba(5, 7, 18, 0.74); }
+.oval {
+  fill: none; stroke: #ffffff; stroke-width: 3; stroke-dasharray: 9 7;
+  vector-effect: non-scaling-stroke; transition: stroke 0.2s ease;
+}
+.oval.good { stroke: var(--mint); stroke-dasharray: none; stroke-width: 5; }
+.flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+.flash.on { animation: flash 0.35s ease-out; }
+@keyframes flash { from { opacity: 0.85; } to { opacity: 0; } }
+
+.cam-status { text-align: center; font-weight: 700; font-size: 1.05rem; margin: 0; min-height: 2.6em; color: var(--text); line-height: 1.3; }
+.cam-status.good { color: var(--mint); }
+.cam-status.bad { color: var(--warn); font-weight: 600; font-size: 0.95rem; }
+
+.shutter-row { display: flex; justify-content: center; }
+.shutter {
+  width: 78px; height: 78px; border-radius: 50%; cursor: pointer;
+  background: #fff; border: 6px solid rgba(255, 255, 255, 0.35); background-clip: padding-box;
+  box-shadow: 0 0 0 3px #fff;
+}
+.shutter:disabled { opacity: 0.35; cursor: not-allowed; }
+.shutter:not(:disabled):active { transform: scale(0.94); }
+
+/* ---------- Result ---------- */
+.result-photo canvas { width: 100%; max-width: 360px; display: block; margin: 0 auto; border-radius: 24px; aspect-ratio: 4 / 5; height: auto; }
+.result-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; text-align: center; }
+.result-label { margin: 0; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.8rem; }
+.result-age { margin: 4px 0; font-size: 4rem; font-weight: 800; line-height: 1; color: var(--mint); }
+.result-age small { font-size: 1.1rem; color: var(--text); font-weight: 600; }
+.result-range { margin: 0 0 14px; color: var(--text); font-weight: 600; }
+.meter { position: relative; height: 12px; border-radius: 6px; background: linear-gradient(90deg, #3b4b8f, #6a4ca3, #a24d7c, #c4634f); }
+.meter-band { position: absolute; top: -3px; height: 18px; border-radius: 9px; background: rgba(124, 242, 197, 0.35); border: 2px solid var(--mint); }
+.meter-dot { position: absolute; top: -6px; width: 24px; height: 24px; margin-left: -12px; border-radius: 50%; background: #fff; border: 4px solid var(--mint); }
+.meter-scale { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); margin-top: 6px; }
+.result-note { color: var(--muted); font-size: 0.9rem; line-height: 1.5; margin: 14px 0 6px; }
+.tech { color: #7d84ad; font-size: 0.78rem; margin: 0; }
+.error-card p:last-child { color: var(--warn); margin: 8px 0 0; }
+
+/* ---------- Loader ---------- */
+.loader { position: fixed; inset: 0; background: rgba(13, 16, 32, 0.88); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 10; }
+.loader p { font-weight: 700; }
+.spinner { width: 52px; height: 52px; border-radius: 50%; border: 5px solid var(--line); border-top-color: var(--mint); animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
